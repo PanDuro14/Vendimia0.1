@@ -8,21 +8,21 @@
     <fragment
         android:id="@+id/nav_ventas"
         android:name="com.example.vendimia01.ui.venta.VentasFragment"
-        android:label="fragment_ventas"
+        android:label="Ventas"
         tools:layout="@layout/fragment_ventas" />
     <fragment
         android:id="@+id/nav_inventario"
         android:name="com.example.vendimia01.ui.inventario.InventarioFragment"
-        android:label="fragment_inventario"
+        android:label="Inventario"
         tools:layout="@layout/fragment_inventario" />
     <fragment
         android:id="@+id/nav_clientes"
         android:name="com.example.vendimia01.ui.clientes.clientesFragment"
-        android:label="fragment_clientes"
+        android:label="Clientes"
         tools:layout="@layout/fragment_clientes" />
     <fragment
         android:id="@+id/nav_list_devices"
         android:name="com.example.vendimia01.ui.listDevices.ListDevicesFragment"
-        android:label="fragment_list_devices"
+        android:label="Devices List"
         tools:layout="@layout/fragment_list_devices" />
 </navigation>
