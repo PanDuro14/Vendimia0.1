@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@id/nav_inventario">
+    app:startDestination="@id/nav_list_devices">
 
     <fragment
         android:id="@+id/nav_ventas"
@@ -16,8 +16,13 @@
         android:label="fragment_inventario"
         tools:layout="@layout/fragment_inventario" />
     <fragment
-        android:id="@+id/clientesFragment"
+        android:id="@+id/nav_clientes"
         android:name="com.example.vendimia01.ui.clientes.clientesFragment"
         android:label="fragment_clientes"
         tools:layout="@layout/fragment_clientes" />
+    <fragment
+        android:id="@+id/nav_list_devices"
+        android:name="com.example.vendimia01.ui.listDevices.ListDevicesFragment"
+        android:label="fragment_list_devices"
+        tools:layout="@layout/fragment_list_devices" />
 </navigation>
