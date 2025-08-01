@@ -39,7 +39,8 @@ public class SharedViewModel extends ViewModel {
     public LiveData<Integer> getHum() {
         return hum;
     }
-
+    public LiveData<Integer> getCurrentFragment() { return currentFragment; }
+    public LiveData<Boolean> getIsConnected(){ return isConnected; }
     // SETTERS
     public void setDeviceAddress(String address) {
         deviceAddress.setValue(address);
@@ -94,13 +95,6 @@ public class SharedViewModel extends ViewModel {
     public void setDataOut(String output) {
         dataOut.setValue(output);
     }
-    public void setIsConnected(boolean status) {
-        isConnected.setValue(status);
-    }
-
-    public void setCurrentFragment(int currentFragmentValue){
-        this.currentFragment.setValue(currentFragmentValue);
-    }
 
     // Método para extraer el valor de una etiqueta dada en el string
     private String extractValue(String data, String label) {
@@ -129,5 +123,15 @@ public class SharedViewModel extends ViewModel {
         // Verificar si el valor está vacío, en cuyo caso devolver null
         return value.isEmpty() ? null : value;
     }
+
+    public void setCurrentFragment(int currentFragmentValue){
+        this.currentFragment.setValue(currentFragmentValue);
+    }
+
+    public void setIsConnected(boolean status) {
+        isConnected.setValue(status);
+    }
+
+
 
 }
