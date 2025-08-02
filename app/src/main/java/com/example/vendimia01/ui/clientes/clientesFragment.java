@@ -57,6 +57,7 @@ public class clientesFragment extends Fragment implements TableActionListener {
 
         db = Room.databaseBuilder(requireContext(), AppDataBase.class, "vendimia-db")
                 .allowMainThreadQueries()
+                .fallbackToDestructiveMigration()
                 .build();
         clienteDao = db.clienteDao();
 
