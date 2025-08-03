@@ -102,8 +102,7 @@ public class clientesFragment extends Fragment implements TableActionListener {
 
     @Override
     public void onDelete(int id) {
-        clienteDao.deleteById(id);
-        loadTableData(tableDynamic);
+        showDeleteDialog(id);
     }
 
     private void loadTableData(TableDynamic tableDynamic){
@@ -211,6 +210,26 @@ public class clientesFragment extends Fragment implements TableActionListener {
                 .setNegativeButton("Cancelar", null)
                 .show();
     }
+
+    private void showDeleteDialog(int id) {
+        android.util.Log.d("TableDynamic", "Intentando eliminar ID: " + id);
+
+        new AlertDialog.Builder(requireContext())
+                .setTitle("Eliminar cliente")
+                .setMessage("¿Estás seguro de que deseas eliminar este cliente?")
+                .setPositiveButton("Sí", (dialog, which) -> {
+                    try {
+                        clienteDao.deleteById(id);
+                        this.loadTableData(tableDynamic);
+                        android.util.Log.d("TableDynamic", "Cliente eliminado con éxito");
+                    } catch (Exception e) {
+                        android.util.Log.e("TableDynamic", "Error al eliminar cliente", e);
+                    }
+                })
+                .setNegativeButton("Cancelar", null)
+                .show();
+    }
+
 
     @Override
     public void onPause() {
