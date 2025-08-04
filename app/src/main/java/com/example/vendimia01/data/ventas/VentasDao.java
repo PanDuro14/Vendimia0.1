@@ -13,7 +13,6 @@ public interface VentasDao {
 
     @Query("SELECT * FROM Ventas")
     List<Ventas> getAll();
-
     @Query("DELETE FROM Ventas WHERE id = :id")
     void deleteById(int id);
 
@@ -22,4 +21,12 @@ public interface VentasDao {
 
     @Update
     void update(Ventas ventas);
+
+    public class VentaTotalPorProducto {
+        public String nombreProducto;
+        public int totalCantidad;
+    }
+
+    @Query("SELECT productos AS nombreProducto, SUM(cantidad) AS totalCantidad FROM Ventas GROUP BY productos")
+    List<VentaTotalPorProducto> getVentasTotalesPorProducto();
 }

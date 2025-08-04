@@ -13,4 +13,5 @@ public class Ventas {
     public float precioTotal;
     public String fecha;
     public String metodoPago;
+    public String cantidad;
 }

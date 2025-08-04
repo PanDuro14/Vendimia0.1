@@ -12,4 +12,9 @@
     <string name="menu_slideshow">Slideshow</string>
     <string name="agregar">Agregar</string>
     <string name="venta">Venta</string>
+
+    <string-array name="metodos_pago">
+        <item>Efectivo</item>
+        <item>Transferencia</item>
+    </string-array>
 </resources>
