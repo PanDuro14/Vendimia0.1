@@ -195,7 +195,7 @@ public class VentasFragment extends Fragment implements TableActionListener {
                 }).setNegativeButton("Cancelar",null)
                 .show();
     }
-    // Método para configurar la gráfica de inventario
+
    /* private void setupInventarioChart() {
         List<BarEntry> entries = new ArrayList<>();
         List<Inventario> inventarioList = inventarioDao.getAll();
@@ -231,7 +231,7 @@ public class VentasFragment extends Fragment implements TableActionListener {
         List<VentasDao.VentaTotalPorProducto> ventasTotales = ventasDao.getVentasTotalesPorProducto();
 
         for (VentasDao.VentaTotalPorProducto item : ventasTotales) {
-            // Asegúrate de que item.totalCantidad se pueda convertir a float
+
             entries.add(new PieEntry(item.totalCantidad, item.nombreProducto));
         }
 
