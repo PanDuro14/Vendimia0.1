@@ -12,7 +12,6 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
-import android.view.View;
 import android.view.Menu;
 import android.widget.Toast;
 
@@ -40,33 +39,34 @@ public class MainActivity extends AppCompatActivity {
     private AppBarConfiguration mAppBarConfiguration;
     private ActivityMainBinding binding;
 
-    // Bluetooth options
     private BluetoothAdapter bluetoothAdapter;
     private BluetoothDevice bluetoothDevice;
     private BluetoothSocket bluetoothSocket;
     private boolean pauseDueToBluetooth = false;
 
-    // SharedViewModel
-    private SharedViewModel sharedViewModel;
-
-    // Manejar la conexión de dispositivos
-    private ConnectedThread MyConnectionBT = null;
+    // SharedViewModel y Handler estáticos para acceso desde el Handler
+    private static SharedViewModel sharedViewModel;
     private static Handler bluetoothIn;
-    private int handlerState = 0;
+    private static int handlerState = 0;
 
-    // Manejar conexión con el esp32
+    private ConnectedThread MyConnectionBT = null;
+
     private static final UUID BTMODULEUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
+    // Setter para que el Handler pueda acceder al SharedViewModel
+    public static void setSharedViewModel(SharedViewModel svm){
+        sharedViewModel = svm;
+    }
 
     @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Inicializar el sharedViewModel y el bluetooth
         sharedViewModel = new ViewModelProvider(this).get(SharedViewModel.class);
-        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        setSharedViewModel(sharedViewModel);  // importante para el Handler
 
+        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if(bluetoothAdapter == null){
             Toast.makeText(this, "Bluetooth no disponible", Toast.LENGTH_SHORT).show();
             finish();
@@ -76,43 +76,35 @@ public class MainActivity extends AppCompatActivity {
             requestBluetoothEnable();
         }
 
-        // regisgrar el reciever
         registerReceiver(btReceiver, new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED));
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        // Instancia del fragmento
-        // No sé si se usa xd
-
-
         setSupportActionBar(binding.appBarMain.toolbar);
-        binding.appBarMain.fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null)
-                        .setAnchorView(R.id.fab).show();
-            }
-        });
+        binding.appBarMain.fab.setOnClickListener(view -> Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                .setAction("Action", null)
+                .setAnchorView(R.id.fab).show());
         DrawerLayout drawer = binding.drawerLayout;
         NavigationView navigationView = binding.navView;
 
         mAppBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.nav_list_devices, R.id.nav_clientes, R.id.nav_inventario, R.id.nav_ventas)
+                R.id.nav_list_devices, R.id.nav_clientes, R.id.nav_inventario, R.id.nav_ventas,R.id.nav_seguridad)
                 .setOpenableLayout(drawer)
                 .build();
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
 
-        // Handler para manejar la lectura de de datos bluetooth
+        // Handler estático que recibe datos Bluetooth
         bluetoothIn = new Handler(){
             public void handleMessage(@NonNull android.os.Message msg){
                 if(msg.what == handlerState){
                     String recivedData = (String) msg.obj;
                     Log.d("Datos", "handleMessage: " + recivedData);
-                    sharedViewModel.setDataIn(recivedData);
+                    if(sharedViewModel != null){
+                        sharedViewModel.setDataIn(recivedData);
+                    }
                 }
             }
         };
@@ -140,7 +132,6 @@ public class MainActivity extends AppCompatActivity {
                     } catch (IOException e){
                         Toast.makeText(getBaseContext(), "Error al cerrar la conexión previa", Toast.LENGTH_SHORT).show();
                     }
-
                 }
 
                 bluetoothDevice = bluetoothAdapter.getRemoteDevice(address);
@@ -237,4 +228,5 @@ public class MainActivity extends AppCompatActivity {
         closeBluetootConnection();
         unregisterReceiver(btReceiver);
     }
+
 }

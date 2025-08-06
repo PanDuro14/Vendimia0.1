@@ -20,5 +20,9 @@
             android:id="@+id/nav_ventas"
             android:icon="@android:drawable/sym_contact_card"
             android:title="Ventas" />
+        <item
+            android:id="@id/nav_seguridad"
+            android:icon="@android:drawable/ic_lock_idle_lock"
+            android:title="nav_seguridad" />
     </group>
 </menu>

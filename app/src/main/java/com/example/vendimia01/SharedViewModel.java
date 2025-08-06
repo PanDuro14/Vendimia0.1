@@ -13,8 +13,10 @@ public class SharedViewModel extends ViewModel {
     private final MutableLiveData<Integer> temp = new MutableLiveData<>();
     private final MutableLiveData<Integer> hum = new MutableLiveData<>();
     private final MutableLiveData<Boolean> isConnected = new MutableLiveData<>(false);
+    private final MutableLiveData<Boolean> movimientoDetectado = new MutableLiveData<>(false);
+    private final MutableLiveData<Boolean> seguridadActivada = new MutableLiveData<>(false);
 
-    public SharedViewModel(){
+    public SharedViewModel() {
         deviceAddress.setValue("No hay dispositivo");
         dataIn.setValue(null);
         dataOut.setValue("No hay datos transmitidos");
@@ -39,8 +41,19 @@ public class SharedViewModel extends ViewModel {
     public LiveData<Integer> getHum() {
         return hum;
     }
-    public LiveData<Integer> getCurrentFragment() { return currentFragment; }
-    public LiveData<Boolean> getIsConnected(){ return isConnected; }
+    public LiveData<Integer> getCurrentFragment() {
+        return currentFragment;
+    }
+    public LiveData<Boolean> getIsConnected() {
+        return isConnected;
+    }
+    public LiveData<Boolean> getMovimientoDetectado() {
+        return movimientoDetectado;
+    }
+    public LiveData<Boolean> getSeguridadActivada() {
+        return seguridadActivada;
+    }
+
     // SETTERS
     public void setDeviceAddress(String address) {
         deviceAddress.setValue(address);
@@ -51,87 +64,83 @@ public class SharedViewModel extends ViewModel {
     public void setHum(int humidity) {
         hum.setValue(humidity);
     }
+    public void setMovimientoDetectado(boolean estado) {
+        movimientoDetectado.setValue(estado);
+    }
+    public void setSeguridadActivada(boolean estado) {
+        seguridadActivada.setValue(estado);
+    }
 
     public void setDataIn(String input) {
-        // Si dataIn es null, le asignamos el valor actual
-        if (dataIn.getValue() == null || dataIn.getValue().isEmpty()) {
-            dataIn.setValue(input);  // Establecer los datos cuando está vacío
-        } else {
-            // Si hay datos previos, simplemente reemplazamos con los nuevos
-            dataIn.setValue(input);  // Reemplazar el valor, sin concatenar
+        if (input == null || input.isEmpty()) return;
+
+        Log.d("BLUETOOTH_IN", "Dato recibido: " + input);
+
+        // Procesar alerta de movimiento
+        if (input.startsWith("ALERTA:")) {
+            String tipoAlerta = input.substring(7).trim();
+            if (tipoAlerta.equals("MOVIMIENTO") || tipoAlerta.contains("vendimia")) {
+                dataIn.setValue("¡ALERTA! Movimiento detectado");
+                movimientoDetectado.setValue(true);
+                return;
+            }
         }
 
-        // Ahora procesamos los datos solo si están completos
-        String data = dataIn.getValue();
-        Log.d("SharedViewModel", "Datos recibidos: " + data);
+        // Resetear estado de alerta
+        if (input.contains("Modo Seguro:DESACTIVADO") || input.contains("DESACTIVADO")) {
+            movimientoDetectado.setValue(false);
+            dataIn.setValue("Modo seguridad desactivado");
+        }
 
-        // Verificamos si los datos contienen los valores necesarios (Humedad y Temperatura, Lumines o PotValue)
-        if (data != null && !data.isEmpty()) {
-            if (data.contains("Humedad:") && data.contains("Temperatura:")) {
-                // Extraemos humedad y temperatura
-                String humedad = extractValue(data, "Humedad:");
-                String temperatura = extractValue(data, "Temperatura:");
+        // Procesamiento para humedad/temperatura
+        if (input.contains("Humedad:") && input.contains("Temperatura:")) {
+            procesarDatosAmbientales(input);
+        } else {
+            // Otros datos no relacionados
+            dataIn.setValue(input);
+        }
+    }
 
-                if (humedad != null && temperatura != null) {
-                    try {
-                        // Procesamos los datos y los actualizamos
-                        float humedadValor = Float.parseFloat(humedad.replace("%", ""));
-                        setHum((int) humedadValor);
+    private void procesarDatosAmbientales(String data) {
+        String humedad = extractValue(data, "Humedad:");
+        String temperatura = extractValue(data, "Temperatura:");
 
-                        float temperaturaValor = Float.parseFloat(temperatura.replace("C", ""));
-                        setTemp((int) temperaturaValor);
-
-                        // Limpiamos los datos procesados
-                        dataIn.setValue(null);  // Limpiamos la cadena acumulada después de procesar los datos
-
-                    } catch (NumberFormatException e) {
-                        Log.e("SharedViewModel", "Error al procesar la humedad o la temperatura", e);
-                    }
-                }
+        if (humedad != null && temperatura != null) {
+            try {
+                setHum((int)Float.parseFloat(humedad.replace("%", "")));
+                setTemp((int)Float.parseFloat(temperatura.replace("C", "")));
+                dataIn.setValue("H: " + humedad + "% T: " + temperatura + "°C");
+            } catch (NumberFormatException e) {
+                Log.e("SharedViewModel", "Error al procesar datos", e);
             }
         }
     }
 
     public void setDataOut(String output) {
+        Log.d("BLUETOOTH_OUT", "Enviando dato: " + output);
         dataOut.setValue(output);
     }
 
-    // Método para extraer el valor de una etiqueta dada en el string
     private String extractValue(String data, String label) {
         int startIndex = data.indexOf(label);
-        if (startIndex == -1) {
-            return null;
-        }
+        if (startIndex == -1) return null;
 
-        // Mover el índice al final de la etiqueta
         startIndex += label.length();
-
-        // Eliminar posibles espacios antes del valor
         while (startIndex < data.length() && Character.isWhitespace(data.charAt(startIndex))) {
             startIndex++;
         }
 
-        // Buscar el siguiente espacio después del valor o tomar el final de la cadena
         int endIndex = data.indexOf(" ", startIndex);
-        if (endIndex == -1) {
-            endIndex = data.length();
-        }
+        if (endIndex == -1) endIndex = data.length();
 
-        // Extraer el valor, asegurándose de eliminar espacios extras
-        String value = data.substring(startIndex, endIndex).trim();
-
-        // Verificar si el valor está vacío, en cuyo caso devolver null
-        return value.isEmpty() ? null : value;
+        return data.substring(startIndex, endIndex).trim();
     }
 
-    public void setCurrentFragment(int currentFragmentValue){
+    public void setCurrentFragment(int currentFragmentValue) {
         this.currentFragment.setValue(currentFragmentValue);
     }
 
     public void setIsConnected(boolean status) {
         isConnected.setValue(status);
     }
-
-
-
 }
