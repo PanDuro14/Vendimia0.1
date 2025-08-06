@@ -35,7 +35,7 @@
             <com.github.mikephil.charting.charts.PieChart
                 android:id="@+id/ventasPieChart"
                 android:layout_width="match_parent"
-                android:layout_height="218dp"
+                android:layout_height="227dp"
                 android:layout_marginBottom="16dp" />
 
             <TextView

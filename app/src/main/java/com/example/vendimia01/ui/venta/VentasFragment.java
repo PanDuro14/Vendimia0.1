@@ -207,6 +207,7 @@ public class VentasFragment extends Fragment implements TableActionListener {
         List<Inventario> inventarioList = inventarioDao.getAll();
         ArrayList<String> labels = new ArrayList<>();
 
+
         for (int i = 0; i < inventarioList.size(); i++) {
             Inventario item = inventarioList.get(i);
             entries.add(new BarEntry(i, item.cantidad));
