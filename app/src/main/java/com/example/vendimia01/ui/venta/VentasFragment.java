@@ -20,6 +20,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
+import com.example.vendimia01.MainActivity;
 import com.example.vendimia01.R;
 import com.example.vendimia01.SharedViewModel;
 import com.example.vendimia01.data.AppDataBase;
@@ -64,7 +65,7 @@ public class VentasFragment extends Fragment implements TableActionListener {
     private SharedViewModel sharedViewModel;
 
     private  String[] header = {"ID", "Producto", "Cantidad", "Total" , "Fecha", "Metodo de pago"};
-    private Integer currentFragment = 3;
+    private Integer currentFragment = 4;
     private boolean isMessageSent = false;
     private BarChart grafica;
     private PieChart graficaVentas;
@@ -87,20 +88,14 @@ public class VentasFragment extends Fragment implements TableActionListener {
         tableDynamic.addHeader(header);
 
 
-        grafica = binding.inventarioChart;
+        //grafica = binding.inventarioChart;
         graficaVentas = binding.ventasPieChart;
         loadTableData();
-        setupInventarioChart();
+        //setupInventarioChart();
         setupVentasChart();
 
-        binding.btnVenta.setOnClickListener(v -> {
-            int conteo = inventarioDao.totalprd();
-            if(conteo > 0){
-                showVentaDialog();
-            }else {
-                Toast.makeText(requireContext(),"No hay productos que vender, agrege uno al inventario", Toast.LENGTH_SHORT).show();
-            }
-        });
+
+        binding.btnVenta.setOnClickListener(v -> showVentaDialog());
 
         return view;
     }
@@ -164,6 +159,7 @@ public class VentasFragment extends Fragment implements TableActionListener {
 
                     if(cantidadStr.isEmpty()){
                         Toast.makeText(requireContext(),"Cantidad invalida", Toast.LENGTH_SHORT).show();
+
                         return;
                     }
                     try{
@@ -189,11 +185,12 @@ public class VentasFragment extends Fragment implements TableActionListener {
                         prodVendido.cantidad -= catidad;
                         inventarioDao.update(prodVendido);
 
-
+                        //  Enviar Bluetooth
+                        ((MainActivity) requireActivity()).enviarDatosBT("3:"+nuevaVenta.precioTotal); //se modifica para separar lo que debe de hacer
 
                         Toast.makeText(requireContext(),"Venta realizada",Toast.LENGTH_SHORT).show();
                         loadTableData();
-                       setupInventarioChart();
+                        // setupInventarioChart();
                         setupVentasChart();
                     }catch (NumberFormatException e){
                         Toast.makeText(requireContext(),"Cantidad invalida", Toast.LENGTH_SHORT).show();
@@ -201,8 +198,8 @@ public class VentasFragment extends Fragment implements TableActionListener {
                 }).setNegativeButton("Cancelar",null)
                 .show();
     }
-
-   private void setupInventarioChart() {
+    // Método para configurar la gráfica de inventario
+   /* private void setupInventarioChart() {
         List<BarEntry> entries = new ArrayList<>();
         List<Inventario> inventarioList = inventarioDao.getAll();
         ArrayList<String> labels = new ArrayList<>();
@@ -216,59 +213,29 @@ public class VentasFragment extends Fragment implements TableActionListener {
 
         BarDataSet dataSet = new BarDataSet(entries, "Inventario Actual");
         dataSet.setColors(ColorTemplate.MATERIAL_COLORS);
-        dataSet.setValueTextColor(Color.WHITE);
-        dataSet.setValueTextSize(10f);
 
         BarData barData = new BarData(dataSet);
         grafica.setData(barData);
+        grafica.invalidate(); // Refrescar gráfica
 
-        // -----------------------------------------------------------
-        // --- Configuracion de la grafica ---
-        // -----------------------------------------------------------
-        XAxis xAxis = grafica.getXAxis();
-
-        // poner las etiquetas al fondo
-        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
-
-        // 2. Establecer el formateador de valores para usar los nombres de los productos
-        xAxis.setValueFormatter(new IndexAxisValueFormatter(labels));
-        xAxis.setDrawLabels(true);
-
-        // tamaño del texto para las etiquetas
-        xAxis.setTextSize(10f);
-
-        //  color del texto para las etiquetas
-        xAxis.setTextColor(Color.WHITE);
-
-        // rotacion de los labels de las barras
-        xAxis.setLabelRotationAngle(-45);
-
-        // 7. Configurar la granularidad y el conteo de etiquetas para evitar superposiciones
-        xAxis.setGranularity(1f);
-        xAxis.setGranularityEnabled(true);
-        xAxis.setLabelCount(labels.size());
-
-        // -----------------------------------------------------------
-        // --- Otras personalizaciones de la gráfica ---
-        // -----------------------------------------------------------
-
-        grafica.getAxisRight().setEnabled(false); // Deshabilita el eje Y derecho
-        grafica.getAxisLeft().setTextColor(Color.WHITE); // Cambia el color del texto del eje Y izquierdo
-
+        // Personalizar la gráfica
+        grafica.getDescription().setText("Cantidad de productos en inventario");
+        grafica.getAxisRight().setEnabled(false);
+        grafica.getXAxis().setDrawGridLines(false);
         grafica.getLegend().setEnabled(true);
-        grafica.getLegend().setTextColor(Color.WHITE);
 
-        // actualizar la gráfica para aplicar todos los cambios
-        grafica.invalidate();
-    }
-
+        // Opcional: configurar los nombres de los productos en el eje X
+        grafica.getXAxis().setValueFormatter(new IndexAxisValueFormatter(labels));
+        grafica.getXAxis().setGranularity(1f);
+        grafica.getXAxis().setLabelCount(labels.size());
+    }*/
 
     private void setupVentasChart() {
         List<PieEntry> entries = new ArrayList<>();
         List<VentasDao.VentaTotalPorProducto> ventasTotales = ventasDao.getVentasTotalesPorProducto();
 
         for (VentasDao.VentaTotalPorProducto item : ventasTotales) {
-
+            // Asegúrate de que item.totalCantidad se pueda convertir a float
             entries.add(new PieEntry(item.totalCantidad, item.nombreProducto));
         }
 
@@ -297,7 +264,7 @@ public class VentasFragment extends Fragment implements TableActionListener {
     private void loadTableData() {
         ArrayList<String[]> data = new ArrayList<>();
         for (Ventas item : ventasDao.getAll()) {
-             data.add(new String[]{
+            data.add(new String[]{
                     String.valueOf(item.id),
                     String.valueOf(item.productos),
                     String.valueOf(item.cantidad),
@@ -312,7 +279,7 @@ public class VentasFragment extends Fragment implements TableActionListener {
     public void onResume() {
         super.onResume();
         loadTableData();
-        setupInventarioChart(); // Refrescar gráfica en onResume
+        //setupInventarioChart(); // Refrescar gráfica en onResume
         setupVentasChart();
         sharedViewModel.setCurrentFragment(currentFragment);
     }
