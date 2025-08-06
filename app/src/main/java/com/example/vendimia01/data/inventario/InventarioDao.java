@@ -25,4 +25,7 @@ public interface InventarioDao {
 
     @Query("DELETE FROM inventario WHERE id = :id")
     void deleteById(int id);
+
+    @Query("SELECT COUNT(*) FROM inventario")
+    int totalprd();
 }

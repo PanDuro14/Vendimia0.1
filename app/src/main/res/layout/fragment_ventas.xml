@@ -6,57 +6,74 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.venta.VentasFragment">
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp">
 
-    <Button
-        android:id="@+id/btn_venta"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Agregar" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Ventas Totales por Producto"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="8dp"
-        android:textStyle="bold"
-        android:textSize="18sp"/>
-
-    <com.github.mikephil.charting.charts.PieChart
-        android:id="@+id/ventasPieChart"
-        android:layout_width="match_parent"
-        android:layout_height="300dp"
-        android:layout_marginBottom="16dp"/>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Registro de Ventas"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="8dp"
-        android:textStyle="bold"
-        android:textSize="18sp"/>
-
-    <HorizontalScrollView
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <ScrollView
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
 
-            <TableLayout
-                android:id="@+id/tableVentas"
+            <Button
+                android:id="@+id/btn_venta"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:stretchColumns="*" />
-        </ScrollView>
-    </HorizontalScrollView>
+                android:text="Agregar" />
 
-</LinearLayout>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="8dp"
+                android:text="Ventas Totales por Producto"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <com.github.mikephil.charting.charts.PieChart
+                android:id="@+id/ventasPieChart"
+                android:layout_width="match_parent"
+                android:layout_height="218dp"
+                android:layout_marginBottom="16dp" />
+
+            <TextView
+                android:id="@+id/textView2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="8dp"
+                android:text="Inventario Actual"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <com.github.mikephil.charting.charts.BarChart
+                android:id="@+id/inventario_chart"
+                android:layout_width="match_parent"
+                android:layout_height="190dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="8dp"
+                android:text="Registro de Ventas"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TableLayout
+                    android:id="@+id/tableVentas"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:stretchColumns="*" />
+            </HorizontalScrollView>
+
+        </LinearLayout>
+    </ScrollView>
+
 </androidx.constraintlayout.widget.ConstraintLayout>
